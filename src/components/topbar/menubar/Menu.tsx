@@ -1,15 +1,15 @@
-import { FC, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'preact/hooks';
 import styled, { css } from 'styled-components';
-import type { IMenu } from '__/helpers/menubar';
+import type { IMenu } from '__/helpers/create-menu-config';
 import { theme } from '__/theme';
-import { ButtonBase } from '../../utils/ButtonBase';
+import { ButtonBase } from '__/components/utils/ButtonBase';
 
-type TMenu = {
+type MenuProps = {
   menu: IMenu<any>;
 };
 
-export const Menu: FC<TMenu> = ({ menu }) => {
-  const ref = useRef<HTMLDivElement | null>(null);
+export const Menu = ({ menu }: MenuProps) => {
+  const ref = useRef<HTMLDivElement>();
 
   useEffect(() => {
     ref.current?.focus();
@@ -17,11 +17,11 @@ export const Menu: FC<TMenu> = ({ menu }) => {
 
   return (
     <Container ref={ref} tabIndex={-1}>
-      {Object.keys(menu).map((val) => [
-        <MenuItem key={val} disabled={menu[val].disabled}>
-          {menu[val].title}
+      {Object.keys(menu).map((key: any) => [
+        <MenuItem key={key} disabled={menu[key].disabled}>
+          {menu[key].title}
         </MenuItem>,
-        menu[val].breakAfter && <Divider key={`${val}-divider`} />,
+        menu[key].breakAfter && <Divider key={`${key}-divider`} />,
       ])}
     </Container>
   );

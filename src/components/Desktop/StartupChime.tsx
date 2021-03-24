@@ -1,12 +1,12 @@
 import { mdiApple } from '@mdi/js';
-import { FC, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import Sound from 'react-sound';
 import styled, { css, keyframes } from 'styled-components';
 import { useTimeout } from '__/hooks/use-timeout';
 import { AppIcon } from '../utils/AppIcon';
-import Sound from 'react-sound';
 
-export const StartupChime: FC<{}> = ({}) => {
-  const ref = useRef<HTMLButtonElement>(null);
+export const StartupChime = () => {
+  const ref = useRef<HTMLButtonElement>();
   const [playStatus, setPlayStatus] = useState<'PLAYING' | 'STOPPED' | 'PAUSED'>('PAUSED');
 
   const [hideSplashScreen, setHideSplashScreen] = useState(false);
@@ -58,7 +58,7 @@ const SplashScreen = styled.div<{ isHidden: boolean }>`
   position: fixed;
   top: 0;
   bottom: 0;
-  z-index: 9999;
+  z-index: 999999999999;
 
   height: 100vh;
   width: 100vw;

@@ -2,7 +2,6 @@ import Tippy from '@tippyjs/react/headless';
 import { transparentize } from 'color2k';
 import { useAtom } from 'jotai';
 import { useImmerAtom } from 'jotai/immer';
-import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { sticky } from 'tippy.js';
 import { ButtonBase } from '__/components/utils/ButtonBase';
@@ -11,50 +10,55 @@ import { menuBarMenusStore } from '__/stores/menubar.store';
 import { theme } from '__/theme';
 import { Menu } from './Menu';
 
-export const MenuBar: FC<{}> = ({}) => {
+const popperOptions = {
+  modifiers: [
+    {
+      name: 'computeStyles',
+      options: {
+        gpuAcceleration: false,
+      },
+    },
+  ],
+};
+
+export const MenuBar = () => {
   const [currentAppMenus] = useAtom(menuBarMenusStore);
   const [activeMenu, setActiveMenu] = useImmerAtom(activeMenuStore);
 
+  const menuIDList = Object.keys(currentAppMenus);
+
+  const tippyOnMount = (menuID: Unpacked<typeof menuIDList>) =>
+    setActiveMenu((val) => {
+      val[menuID] = true;
+      return val;
+    });
+
+  const tippyOnHide = (menuID: Unpacked<typeof menuIDList>) =>
+    setActiveMenu((val) => {
+      val[menuID] = false;
+      return val;
+    });
+
   return (
     <>
-      {/* @ts-ignore */}
-      {Object.keys(currentAppMenus).map((menuID: keyof typeof currentAppMenus) => (
+      {menuIDList.map((menuID) => (
         <Tippy
           key={menuID}
-          trigger={`focusin mouseenter`}
+          trigger="focusin mouseenter"
           hideOnClick={false}
           placement="bottom-start"
           sticky
           zIndex={99999999}
           plugins={[sticky]}
-          onMount={() =>
-            void setActiveMenu((val) => {
-              val[menuID] = true;
-              return val;
-            })
-          }
-          popperOptions={{
-            modifiers: [
-              {
-                name: 'computeStyles',
-                options: {
-                  gpuAcceleration: false,
-                },
-              },
-            ],
-          }}
-          onHide={() =>
-            void setActiveMenu((val) => {
-              val[menuID] = false;
-              return val;
-            })
-          }
+          onMount={() => tippyOnMount(menuID)}
+          popperOptions={popperOptions}
+          onHide={() => tippyOnHide(menuID)}
           interactive
           appendTo={document.body}
           render={(attrs) => (
             <div {...attrs}>
               {/* @ts-ignore */}
-              <Menu menu={currentAppMenus[menuID].menu}>Hello</Menu>
+              <Menu menu={currentAppMenus[menuID].menu} />
             </div>
           )}
         >

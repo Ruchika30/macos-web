@@ -2,31 +2,36 @@ import { transparentize } from 'color2k';
 import { useMotionValue } from 'framer-motion';
 import { useAtom } from 'jotai';
 import styled from 'styled-components';
-import { dockItemsStore } from '__/stores/dock.store';
+import { appsConfig } from '__/data/apps/apps-config';
+import { openAppsStore } from '__/stores/apps.store';
 import { theme } from '__/theme';
 import { DockItem } from './DockItem';
 
 /**
  * The famous MacOS Dock
  */
-export const Dock = ({}) => {
-  const [{ dockItems }] = useAtom(dockItemsStore);
+export const Dock = () => {
+  const [openApps] = useAtom(openAppsStore);
 
-  const mouseX = useMotionValue<number | null>(null);
-
-  const dockItemsKeys = Object.keys(dockItems) as (keyof typeof dockItems)[];
+  const mouseX = useMotionValue(0);
 
   return (
     <DockContainer>
       <DockEl
         onMouseMove={(event) => mouseX.set(event.nativeEvent.x)}
-        onMouseLeave={() => mouseX.set(null)}
+        onMouseLeave={() => mouseX.set(0)}
       >
-        {dockItemsKeys.map((dockTitle) => {
-          const { breakBefore } = dockItems[dockTitle];
+        {Object.keys(appsConfig).map((appID) => {
+          const { dockBreaksBefore } = appsConfig[appID];
           return [
-            breakBefore && <Divider key={`${dockTitle}-divider`} aria-hidden="true" />,
-            <DockItem key={dockTitle} mouseX={mouseX} {...dockItems[dockTitle]} />,
+            dockBreaksBefore && <Divider key={`${appID}-divider`} aria-hidden="true" />,
+            <DockItem
+              key={appID}
+              mouseX={mouseX}
+              appID={appID}
+              isOpen={openApps[appID]}
+              {...appsConfig[appID]}
+            />,
           ];
         })}
       </DockEl>
@@ -35,8 +40,7 @@ export const Dock = ({}) => {
 };
 
 const DockContainer = styled.section`
-  position: fixed;
-  bottom: 0.3rem;
+  margin-bottom: 0.3rem;
   left: 0;
   z-index: 9900;
 
