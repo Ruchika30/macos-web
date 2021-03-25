@@ -7,7 +7,19 @@ export default defineConfig({
   plugins: [
     preact(),
     {
-      ...babel({ babelHelpers: 'bundled' }),
+      ...babel({
+        babelHelpers: 'bundled',
+        plugins: [
+          [
+            'styled-components',
+            {
+              minify: true,
+              transpileTemplateLiterals: true,
+              pure: true,
+            },
+          ],
+        ],
+      }),
       enforce: 'pre',
       apply: 'build',
     },
